@@ -1,13 +1,15 @@
 using System;
 using System.Reflection;
-using Chestworks.Modules.Network;
+using Chestworks.Core;
 using Chestworks.Common;
 using HarmonyLib;
 
 namespace Chestworks.Compatibility;
 /// <summary>
-///     Adds the matching purpose's stock to SeneaL UI's panel counts where its own chest setting is off.
-///     Stands down once SeneaL UI calls <see cref="API.ShowsStock" /> or its <c>Stock</c> class is not found as expected.
+///     Bridges Chestworks to SeneaL UI's build and crafting panels. It finds SeneaL UI's <c>Stock</c> class by
+///     reflection, defers building and crafting to SeneaL UI while its own chest settings are on, and otherwise
+///     names the purpose whose stock the panel patches add to the counts. It stands down once SeneaL UI calls
+///     <see cref="ChestworksAPI.ShowsStock" /> or when the <c>Stock</c> class does not have the expected shape.
 /// </summary>
 internal static class SeneaLStock
 {

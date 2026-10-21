@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Chestworks.Modules.Network;
-/// <summary>Every loaded container that could take part, registered as it wakes.</summary>
+namespace Chestworks.Core;
+/// <summary>
+///     Tracks every loaded container that could join the storage network, registered as it wakes and dropped
+///     when destroyed or found unloaded. Each entry caches the rigidbody and ship of the container's root, which
+///     <see cref="Usability" /> uses to reject storage on moving carts and ships. Containers carried by a player are never registered.
+/// </summary>
 internal static class Registry
 {
     internal sealed class Entry

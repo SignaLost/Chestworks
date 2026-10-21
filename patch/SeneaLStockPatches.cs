@@ -1,10 +1,11 @@
 using System;
 using System.Reflection;
-using HarmonyLib;
-using Chestworks.Modules.Network;
 using Chestworks.Common;
+using Chestworks.Compatibility;
+using Chestworks.Core;
+using HarmonyLib;
 
-namespace Chestworks.Compatibility.Patches;
+namespace Chestworks.Patch;
 /// <summary>Adds the purpose's stock to the "have" count on SeneaL UI's panels.</summary>
 [HarmonyPatch]
 internal static class SeneaL_Stock_Count_Patch

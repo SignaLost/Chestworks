@@ -1,5 +1,5 @@
 using BepInEx.Bootstrap;
-using Chestworks.Modules.Network;
+using Chestworks.Core;
 
 namespace Chestworks.Compatibility;
 

@@ -1,8 +1,8 @@
 # How do I use Chestworks from my mod?
 
-Everything goes through `Chestworks.API`, a public static class in Chestworks.dll. It
+Everything goes through `ChestworksAPI`, a public static class in Chestworks.dll. It
 works for the local player, must be called from the main thread, and returns nothing (or
-does nothing) before a world loads. `API.Version` rises when members are added; existing
+does nothing) before a world loads. `ChestworksAPI.Version` rises when members are added; existing
 members keep their meaning.
 
 ## Purposes
@@ -42,7 +42,7 @@ private static readonly ReachRules Rules = new();
 
 private void Awake()
 {
-    API.RegisterReach(Purposes.Crafting, "My.Crafting.Mod", player =>
+    ChestworksAPI.RegisterReach(Purposes.Crafting, "My.Crafting.Mod", player =>
     {
         if (!MyConfig.Enabled.Value)
         {
@@ -70,12 +70,12 @@ warning; `UnregisterReach` gives it up.
 Add `Stock` to the inventory count you show. It counts the purpose's containers only:
 
 ```csharp
-int have = player.GetInventory().CountItems("$item_wood") + API.Stock(Purposes.Building, "$item_wood");
+int have = player.GetInventory().CountItems("$item_wood") + ChestworksAPI.Stock(Purposes.Building, "$item_wood");
 ```
 
 Item names are the game's shared names. Counts are cached for the frame, so calling
 `Stock` for every requirement row each frame is fine. To recompute only when something
-changed, keep the last `API.Revision` and redraw when it differs; it also rises when the
+changed, keep the last `ChestworksAPI.Revision` and redraw when it differs; it also rises when the
 player moves away from containers or a purpose turns off.
 
 `IsActive(purpose)` says whether the purpose reaches anything right now, such as for
@@ -85,7 +85,7 @@ If your mod is an interface that Chestworks keeps a compatibility patch for, cal
 once at startup to switch that patch off:
 
 ```csharp
-API.ShowsStock("my.ui.mod.guid");
+ChestworksAPI.ShowsStock("my.ui.mod.guid");
 ```
 
 ## Taking for a cost
@@ -99,7 +99,7 @@ int shortfall = needed - player.GetInventory().CountItems(name);
 
 if (shortfall > 0)
 {
-    API.Take(Purposes.Building, name, shortfall);
+    ChestworksAPI.Take(Purposes.Building, name, shortfall);
 }
 ```
 
@@ -113,7 +113,7 @@ asked if another player emptied a chest just before.
 given point first, and returns how many went in. Anything left is yours to place:
 
 ```csharp
-int stored = API.Store(Purposes.Building, piece.transform.position, woodPrefab, 10, exclude: piece);
+int stored = ChestworksAPI.Store(Purposes.Building, piece.transform.position, woodPrefab, 10, exclude: piece);
 ```
 
 `exclude` keeps items out of a container that is about to disappear, such as a chest
@@ -126,7 +126,7 @@ If your mod pulls from chests on its own for a purpose, tell Chestworks while it
 nothing is counted or taken twice:
 
 ```csharp
-API.DefersTo("my.mod.guid", Purposes.Crafting, () => MyConfig.FromChests.Value);
+ChestworksAPI.DefersTo("my.mod.guid", Purposes.Crafting, () => MyConfig.FromChests.Value);
 ```
 
 Pass null as the purpose to defer every purpose. Storing is not held back.
@@ -164,7 +164,7 @@ Every member but `RegisterReach` uses only game and system types, so reflection 
 ```csharp
 if (Chainloader.PluginInfos.TryGetValue("NullSignal.Chestworks", out PluginInfo info))
 {
-    Type api = info.Instance.GetType().Assembly.GetType("Chestworks.API");
+    Type api = info.Instance.GetType().Assembly.GetType("Chestworks.ChestworksAPI");
     MethodInfo stock = api?.GetMethod("Stock");
     int have = stock != null ? (int)stock.Invoke(null, new object[] { "building", "$item_wood", -1 }) : 0;
 }

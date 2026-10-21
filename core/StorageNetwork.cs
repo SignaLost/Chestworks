@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Chestworks.Common;
 
-namespace Chestworks.Modules.Network;
+namespace Chestworks.Core;
 
 /// <summary>
-///     The containers each purpose reaches for the local player, nearest first, and changes to them. A container
-///     another game controls is changed through <see cref="ContainerRequests" /> on a modded server and taken over on a vanilla one.
+///     The core of Chestworks: each purpose's reach rules, the usable containers they reach for the local player
+///     sorted nearest first, cached stock counts, and taking and storing items across those containers. Containers
+///     are gathered from <see cref="Registry" /> on a short interval and filtered by <see cref="Usability" />; other mods
+///     can defer a purpose to themselves. A container another game owns is changed locally and through
+///     <see cref="ContainerRequests" /> on a modded server, or claimed via <see cref="Ownership" /> on a vanilla one.
 /// </summary>
 internal static class StorageNetwork
 {
@@ -264,7 +267,10 @@ internal static class StorageNetwork
         return false;
     }
 
-    /// <summary>Takes up to the amount from the purpose's containers, nearest first. Returns what was taken.</summary>
+    /// <summary>
+    ///     Takes up to the amount from the purpose's containers, nearest first, and returns what was taken.
+    ///     Each removal from a container another game owns must be mirrored to that owner.
+    /// </summary>
     internal static int Take(string purpose, string name, int amount, int quality, bool worldLevelBased)
     {
         int taken = 0;
@@ -410,7 +416,6 @@ internal static class StorageNetwork
         SortByDistance(into, point);
     }
 
-    /// <summary>Orders the containers nearest the point first.</summary>
     private static void SortByDistance(List<Container> containers, Vector3 point)
     {
         _distances.Clear();

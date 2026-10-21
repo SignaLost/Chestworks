@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Chestworks.Core;
 using HarmonyLib;
 using UnityEngine;
 
-namespace Chestworks.Modules.Network.Patches;
+namespace Chestworks.Patch;
 /// <summary>Registers containers as they load.</summary>
 [HarmonyPatch(typeof(Container), "Awake")]
 internal static class Container_Awake_Registry_Patch

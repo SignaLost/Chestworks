@@ -1,8 +1,10 @@
+using Chestworks.Common;
+using Chestworks.Core;
 using HarmonyLib;
 using UnityEngine;
-using Chestworks.Common;
 
-namespace Chestworks.Modules.Network.Patches;
+namespace Chestworks.Patch;
+/// <summary>Registers the container request RPCs when a game starts.</summary>
 [HarmonyPatch(typeof(Game), nameof(Game.Start))]
 internal static class Game_Start_ContainerRequests_Patch
 {

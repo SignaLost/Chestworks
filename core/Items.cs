@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Chestworks.Modules.Network;
+namespace Chestworks.Core;
 
 /// <summary>Adding and dropping items the way the game does.</summary>
 internal static class Items

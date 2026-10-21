@@ -1,13 +1,14 @@
 using Chestworks.Common;
 
-namespace Chestworks.Modules.Network;
+namespace Chestworks.Core;
 
-/// <summary>Who applies a change to a container.</summary>
+/// <summary>Decides which game applies a change to a container's inventory.</summary>
 internal static class Ownership
 {
     /// <summary>
-    ///     Prepares a change to the container; returns true when its owner must apply it. Otherwise
-    ///     this game owns the container afterward, taking it over on a vanilla server.
+    ///     Prepares a local change to the container. Returns true when another game owns it on a modded server;
+    ///     the caller must then send the same change to the owner through <see cref="ContainerRequests" />.
+    ///     Otherwise this game owns the container afterward, claiming it from the previous owner on a vanilla server.
     /// </summary>
     internal static bool Prepare(Container container)
     {

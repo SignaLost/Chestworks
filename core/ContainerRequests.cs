@@ -1,17 +1,19 @@
 using UnityEngine;
 using Chestworks.Common;
 
-namespace Chestworks.Modules.Network;
+namespace Chestworks.Core;
 /// <summary>
-///     Changes to a container another game controls, applied by that game. A request that reaches a
-///     game which no longer owns the container is passed on to the new owner.
+///     Sends take and store changes for a container another game owns to that owner over routed RPCs, used on
+///     servers that run Chestworks. The sender has already applied the change to its local copy; the owner applies
+///     it to the authoritative inventory. A request that reaches a game which no longer owns the container is
+///     passed on to the new owner, up to <see cref="MaxHops" /> times, and dropped if it returns to its origin.
 /// </summary>
 internal static class ContainerRequests
 {
     private const string TakeRpc = "Chestworks_ContainerTake";
     private const string StoreRpc = "Chestworks_ContainerStore";
 
-    /// <summary>How often a request may be passed on.</summary>
+    /// <summary>How many times a request may be passed on.</summary>
     private const int MaxHops = 2;
 
     internal static void Register()
@@ -20,6 +22,7 @@ internal static class ContainerRequests
         ZRoutedRpc.instance.Register<ZDOID, ZPackage>(StoreRpc, OnStore);
     }
 
+    /// <summary>Asks the container's owner to remove items this game already removed from its local copy.</summary>
     internal static void Take(ZNetView view, string name, int amount, int quality, bool worldLevelBased)
     {
         ZPackage package = new();
@@ -30,6 +33,7 @@ internal static class ContainerRequests
         Send(TakeRpc, view.GetZDO(), package, ZDOMan.GetSessionID(), 0);
     }
 
+    /// <summary>Asks the container's owner to add items this game already added to its local copy.</summary>
     internal static void Store(ZNetView view, string prefab, int amount, bool cheated)
     {
         ZPackage package = new();
@@ -74,6 +78,7 @@ internal static class ContainerRequests
         }
     }
 
+    /// <summary>Adds the items on the owner's game, dropping any that do not fit beside the container.</summary>
     private static void OnStore(long sender, ZDOID id, ZPackage package)
     {
         long origin = package.ReadLong();

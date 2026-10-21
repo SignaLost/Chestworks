@@ -28,7 +28,7 @@ they are on, so materials are never counted or taken twice.
 
 ## For mod authors
 
-`Chestworks.API` registers a purpose's reach, reads stock, takes and stores, and checks
+`ChestworksAPI` registers a purpose's reach, reads stock, takes and stores, and checks
 whether storage is in use. The FAQ has a guide with examples.
 
 ## More

@@ -18,5 +18,5 @@ First release, split out of Valchitecture so other mods can share the same stora
 - **Compatibility**: MultiUserChest's shared chests stay usable while open; AzuCraftyBoxes
   and SeneaL UI's own chest settings are left in charge; SeneaL UI's panels count the
   network until it reads the API itself.
-- `Chestworks.API` for other mods: reach registration, stock, revision, taking, storing,
+- `ChestworksAPI` for other mods: reach registration, stock, revision, taking, storing,
   adding items, and storage-in-use checks.

@@ -8,7 +8,12 @@ using Chestworks.Common;
 
 namespace Chestworks;
 
-/// <summary>A storage network other mods draw on: which containers are in reach, and safe changes to them.</summary>
+/// <summary>
+///     The BepInEx entry point for Chestworks, a library mod that gives other mods a shared storage network:
+///     which containers are in reach for a purpose, and multiplayer-safe ways to count, take and store items in them.
+///     On load it sets up logging, registers the AzuCraftyBoxes deferral and applies every Harmony patch class
+///     on its own, so one failing patch leaves the rest in place.
+/// </summary>
 [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 [BepInProcess("valheim.exe")]
 [BepInProcess("valheim.x86_64")]

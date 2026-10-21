@@ -66,16 +66,20 @@ in their editor.
 
 ## Source layout
 
-Only the plugin entry point sits at the root. Namespaces follow folders, so a type's
-namespace says where its file is. Each module keeps its Harmony patches in a `Patches/`
-folder beside the code they serve; logic never lives in a patch file.
+Only the plugin entry point sits at the root. Code the mod needs to work is in `core/`;
+optional features that a setting or ability turns on are in `modules/`, with a subfolder
+only for a feature of several files. Every Harmony patch is in `patch/`. Namespaces follow
+folders: `core/` is `Chestworks.Core`, `patch/` is `Chestworks.Patch`. The public API in `api/` is
+in the `Chestworks` namespace itself. Chestworks has no optional features, so it has no
+`modules/`.
 
 | Folder | Contents |
 |---|---|
-| `Api/` | The public API: `API`, purposes and reach rules |
-| `Common/` | Logging and server detection |
-| `Modules/Network/` | The storage network: container registry, ownership, usability, item moves and requests |
-| `Compatibility/` | Hooks for other container mods |
+| `api/` | The public API: `API`, purposes and reach rules |
+| `common/` | Logging and server detection |
+| `core/` | The storage network: container registry, ownership, usability, item moves and requests |
+| `compatibility/` | Support for other container mods |
+| `patch/` | Every Harmony patch |
 | `Thunderstore/` | The package icon, copied into the output folder |
 | `faq/` | The mod page's FAQ entries, copied into the output folder |
 

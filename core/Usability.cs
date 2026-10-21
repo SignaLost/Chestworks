@@ -3,9 +3,13 @@ using BepInEx.Bootstrap;
 using UnityEngine;
 using Chestworks.Common;
 
-namespace Chestworks.Modules.Network;
+namespace Chestworks.Core;
 
-/// <summary>Which containers may be drawn on, and which storage another player is using.</summary>
+/// <summary>
+///     Decides which containers the local player may draw on and which storage another player is using.
+///     A usable container is player-built, passes the game's privacy and ward checks, is not open on another
+///     game unless MultiUserChest runs on a modded server, and is not on a moving, steered or pulled cart or ship.
+/// </summary>
 internal static class Usability
 {
     private static readonly List<Container> _containers = new();

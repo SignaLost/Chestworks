@@ -21,7 +21,7 @@ opened it first has it open; players viewing it alongside them are not marked.
 
 ## SeneaL UI
 
-SeneaL UI draws its own build and crafting panels. Until it reads `Chestworks.API`
+SeneaL UI draws its own build and crafting panels. Until it reads `ChestworksAPI`
 itself, Chestworks adds the matching purpose's stock to those panels' counts and their
 "from chests" marker. With SeneaL UI's own `[Chests] BuildFromChests` or `FromChests` on,
 it takes from chests itself and Chestworks leaves that purpose to it.
