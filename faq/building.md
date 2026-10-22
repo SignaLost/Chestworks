@@ -1,4 +1,4 @@
-# Building from source
+# How do I build it from source?
 
 Works on Linux, macOS and Windows with the .NET SDK alone; no Mono or Visual Studio.
 
@@ -18,8 +18,8 @@ dotnet build -c Release
 ```
 
 The build finds Valheim in the usual Steam locations, BepInEx in the game folder or a
-Gale/r2modman `Default` profile, and Jotunn in that BepInEx's `plugins`. It prints what
-it found, publicizes the game assemblies as it goes, and installs the whole package into
+Gale or r2modman `Default` profile, and Jotunn in that BepInEx's `plugins`. It prints
+what it found, publicizes the game assemblies, and installs the whole package into
 `BepInEx/plugins/NullSignal.Chestworks`, the way a mod manager would.
 
 If any of those guesses is wrong, say so once in a `Directory.Build.props` beside the
@@ -37,48 +37,43 @@ If any of those guesses is wrong, say so once in a `Directory.Build.props` besid
 ```
 
 `GamePath` is the folder that contains `valheim_Data`. `BepInExPath` is both what the
-build compiles against and where it deploys, so point it at the profile you launch.
-Any property can also be passed per build: `dotnet build -c Release -p:GamePath=...`.
+build compiles against and where it deploys, so point it at the profile you launch. Any
+property can also be passed per build: `dotnet build -c Release -p:GamePath=...`.
 
 ## Packaging
 
-The build also lays out `bin/Release` the way a mod manager expects, so it can be zipped
-as it stands:
+The build lays out `bin/Release` the way a mod manager expects, so it can be zipped as
+it stands:
 
 ```
 manifest.json  Chestworks.dll  Chestworks.pdb  Chestworks.xml  icon.png  README.md  CHANGELOG.md  LICENSE.md  faq/
 ```
 
-The manifest, icon and README have to sit at the archive root. `icon.png` must be exactly
-256x256. The `faq/` pages take their titles from each file's first line.
-
 `manifest.json` is generated from the `.csproj`, so the version lives in one place:
 `Version` is the release number, `Description` the blurb the mod list shows (256
 characters at most), `ManifestWebsite` the repository URL, and the dependency lines in
-the `PackageFiles` target pin the BepInEx pack and Jotunn.
+the `PackageFiles` target pin the BepInEx pack and Jotunn. `icon.png` must be exactly
+256x256.
 
-`PluginGuid` names the folder deployed into and the config file, and the DLL stays
-`Chestworks.dll`. The build fails if it stops matching the constant in
-`ChestworksPlugin.cs`, as does a version that drifts from `Version`.
+`PluginGuid` names the folder deployed into and the config file; the DLL stays
+`Chestworks.dll`. The build fails if `PluginGuid` or `Version` stops matching the
+constants in `ChestworksPlugin.cs`.
 
 `Chestworks.xml` carries the API's documentation, so mods that reference the DLL see it
 in their editor.
 
 ## Source layout
 
-Only the plugin entry point sits at the root. Code the mod needs to work is in `core/`;
-optional features that a setting or ability turns on are in `modules/`, with a subfolder
-only for a feature of several files. Every Harmony patch is in `patch/`. Namespaces follow
-folders: `core/` is `Chestworks.Core`, `patch/` is `Chestworks.Patch`. The public API in `api/` is
-in the `Chestworks` namespace itself. Chestworks has no optional features, so it has no
-`modules/`.
+Only the plugin entry point sits at the root. Namespaces follow folders: `core/` is
+`Chestworks.Core`, `patch/` is `Chestworks.Patch`, and so on; the public API in `api/`
+is in the `Chestworks` namespace itself.
 
 | Folder | Contents |
 |---|---|
-| `api/` | The public API: `API`, purposes and reach rules |
+| `api/` | The public API: `ChestworksAPI`, `Purposes` and `ReachRules` |
 | `common/` | Logging and server detection |
-| `core/` | The storage network: container registry, ownership, usability, item moves and requests |
-| `compatibility/` | Support for other container mods |
+| `core/` | The storage network: container registry, reach and stock, usability, ownership, item moves and requests to other games |
+| `compatibility/` | Support for AzuCraftyBoxes and SeneaL UI |
 | `patch/` | Every Harmony patch |
 | `Thunderstore/` | The package icon, copied into the output folder |
 | `faq/` | The mod page's FAQ entries, copied into the output folder |

@@ -326,8 +326,17 @@ internal static class StorageNetwork
         ItemDrop.ItemData template = drop.m_itemData;
         int stored = 0;
 
-        _scratch.Clear();
-        _scratch.AddRange(Available(purpose));
+        if (Deferred(purpose))
+        {
+            // Available is emptied while the purpose is deferred, so storing scans on its own.
+            Collect(Player.m_localPlayer, rules, point, _scratch);
+        }
+        else
+        {
+            _scratch.Clear();
+            _scratch.AddRange(Available(purpose));
+        }
+
         SortByDistance(_scratch, point);
 
         foreach (Container container in _scratch)
