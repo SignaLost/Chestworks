@@ -1,40 +1,50 @@
 # Chestworks
 
-A shared storage network for Valheim mods. Chestworks decides which containers a mod may
-draw on, takes from them and stores into them safely in multiplayer, and gives every mod
-and interface one place to ask how much is at hand.
+Chestworks lets Valheim mods use the items in your chests. It finds the chests near you,
+takes what a mod needs, puts items back, and keeps it all safe when several players share
+the same storage.
 
-On its own it adds nothing to the game. Mods that use it, such as **Valchitecture**
-building from your chests, share the same rules and the same safety, and an interface mod
-that supports Chestworks shows the right counts for all of them.
+On its own it adds nothing to the game. You install it because a mod you use needs it,
+such as **Valchitecture**, which lets you build straight from your chests. Every mod that
+uses Chestworks follows the same rules, and a menu mod that supports it shows the right
+item counts for all of them.
 
-## What it handles
+## What it does
 
-**Reach.** Each use of the network, such as building or crafting, is a purpose with its
-own reach, set by the mod that owns it: a distance around you, the range of the stations
-covering you or the work, and optionally every station linked to those by overlapping
-ranges. The containers nearest the work are used first.
+**Finds the chests in reach.** Each mod decides how far its feature reaches, such as
+building or crafting: a distance around you, the range of nearby crafting stations,
+or a whole chain of stations whose ranges overlap. The chests closest to the work
+are used first.
 
-**Which containers count.** Containers players built: chests, carts, ships and those
-added by other mods. Never one that is open, a cart being pulled, a ship under way, a
-private chest that is not yours, or one inside a ward you cannot open.
+**Uses only storage players built.** Chests, carts, ships and storage from other mods all
+count. It skips anything someone has open, a cart being pulled, a moving ship, someone
+else's private chest, and chests inside a ward you can't open.
 
-**Multiplayer.** A container is only ever changed by the game that controls it, so
-nothing is duplicated or lost when several players use the same storage. With
-MultiUserChest, open chests stay usable.
+**Stays safe in multiplayer.** Only one player's game changes a chest at a time, so
+nothing gets duplicated or lost when several players use the same storage. With
+MultiUserChest and Chestworks on the server, a chest someone else has open stays usable.
 
-**Other mods.** AzuCraftyBoxes, when installed, and SeneaL UI's own chest settings, when
-on, are left in charge, so materials are never counted or taken twice.
+**Works alongside similar mods.** If AzuCraftyBoxes is installed, or SeneaL UI's own
+chest settings are on, Chestworks lets them do the job, so materials are never counted
+or taken twice.
 
 ## For mod authors
 
-`ChestworksAPI` registers a purpose's reach, reads stock, takes and stores, and checks
-whether storage is in use. The FAQ has a guide with examples.
+`ChestworksAPI` lets your mod set its reach, read how many items are at hand, take
+and store items, and check whether storage is in use. The API page of the FAQ has a
+guide with examples.
 
 ## More
 
-The FAQ covers which containers the network uses, multiplayer, other mods, the API,
-installing and building from source.
+The FAQ explains which containers Chestworks uses, how it works with other mods and how
+to install it. For mod authors, it also covers the API and building from source.
+
+## Credits
+
+- **MSchmoecker**: *MultiUserChest*, the inspiration for changing a container through the
+  game that controls it.
+- **Azumatt**: *AzuCraftyBoxes*, the inspiration for building and crafting from nearby
+  containers.
 
 ## License
 

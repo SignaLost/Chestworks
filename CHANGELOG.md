@@ -2,19 +2,18 @@
 
 ## 1.0.0
 
-First release, split out of Valchitecture so other mods can share the same storage.
+First release. Chestworks was split out of Valchitecture so other mods can share
+the same storage.
 
-- **Purposes** with their own reach, set by the mod that owns each: a radius around the
-  character, the range of stations covering the character or the work, and stations
-  linked to those by overlapping ranges.
-- **Container rules**: player-built containers only; open containers, pulled or moving
-  carts, ships under way, private chests of others and warded containers are skipped.
-- **Safe changes in multiplayer**: on a server running Chestworks, the game controlling a
-  container applies every change; on a vanilla server the container is taken over first,
-  as the game's take-all does.
-- **Compatibility**: MultiUserChest's open chests stay usable on a server running
-  Chestworks; AzuCraftyBoxes and SeneaL UI's own chest settings are left in charge;
-  SeneaL UI's panels count the network until SeneaL UI reads the API itself.
-- **`ChestworksAPI`** for other mods: reach registration, deferral, stock and revision,
-  the containers in reach, cheated-item checks, taking, storing, adding items, and
-  storage-in-use checks.
+- Mods can use the chests within a set distance of you, within the range of nearby
+  crafting stations, or along a chain of stations whose ranges overlap.
+- Only storage players built is used. Open chests, carts being pulled, moving ships,
+  other players' private chests and chests inside wards you can't open are skipped.
+- Nothing gets duplicated or lost when several players use the same chests.
+- Also works on servers that don't have Chestworks installed.
+- With MultiUserChest, a chest someone else has open stays usable, as long as the server
+  has Chestworks too.
+- AzuCraftyBoxes and SeneaL UI's own chest settings are left in charge, so nothing is
+  counted or taken twice.
+- SeneaL UI's build and crafting panels count the items in your chests.
+- `ChestworksAPI` lets other mods use the chests in reach.

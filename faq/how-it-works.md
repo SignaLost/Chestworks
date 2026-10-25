@@ -1,55 +1,44 @@
-# Which containers does the network use?
+# Which containers does Chestworks use?
 
 ## Which containers count
 
-Any container a player built: chests, carts, ships and containers added by other mods.
-Containers that came with the world, such as dungeon chests, do not count, and neither
-do the ones a player carries. A container is skipped while:
+Any storage a player built: chests, carts, ships and storage added by other mods.
+Containers that came with the world, such as dungeon chests, don't count, and neither
+does anything a player carries.
 
-- it is open, by you or anyone else. With MultiUserChest installed and the server
-  running Chestworks, only one you have open yourself is skipped;
-- it is a cart being pulled, a ship with someone at the helm or its speed set to anything
-  but stop, or a cart or ship moving faster than 0.5 m/s;
-- it is private and not yours, or inside a ward you have no access to, as when opening
-  it.
+A container is skipped while:
+
+- someone has it open, you or anyone else. With MultiUserChest, and Chestworks on the
+  server, only a chest you have open yourself is skipped;
+- it's a cart being pulled or moving, or a ship that's sailing or has someone at the helm;
+- it's someone else's private chest, or inside a ward you can't open.
 
 ## How far it reaches
 
-Each purpose, such as building, has a reach set by the mod that owns it. A reach is made
-of up to three parts and covers everything any of them covers:
+Each mod decides how far its feature reaches, such as building or crafting. The reach can
+include any of these:
 
-- a **distance** around your character;
-- the build range of every **station** covering you or the place the work happens, such
-  as the piece being placed;
-- every station **linked** to those, where two stations link when their ranges overlap.
-  Any kind of station links: a workbench, forge and stonecutter whose ranges overlap form
-  one network, and a chain of them reaches as far as it goes.
+- a **distance** around you;
+- the range of every **crafting station** that covers you or the spot you're working on,
+  such as where you're placing a piece;
+- every station **linked** to those. Two stations link when their ranges overlap, whatever
+  kind they are: a workbench, forge and stonecutter side by side form one group, and a
+  chain of them reaches as far as it goes.
 
-Ranges are each station's current build range, so mods and settings that change station
-ranges carry through. The containers nearest the work are used first.
+Mods and settings that change station ranges carry over. The containers closest to the
+work are used first.
 
-## How current the counts are
+## Are the counts up to date?
 
-The set of containers is gathered again four times a second, or sooner when you or the
-work move four meters. Counts are read fresh each frame and pick up another player's
-changes as soon as they arrive, rather than waiting for the game's own once-a-second
-check.
+Yes. Item counts keep up as you move around and as other players take from or add to
+the same chests.
 
 ## Multiplayer
 
-A container's contents are saved by whoever's game currently controls it, and only that
-game may change them. When the server runs Chestworks, every player has it, so your game
-asks the controlling game to take or add the items. Your own copy changes at once, so the
-next count is right, and the controlling game's next update replaces it. If a chest was
-emptied in the moment between, that game takes what is there; if one filled up before
-stored items arrived, the rest drops next to it.
+Only one player's game changes a chest at a time, so nothing gets duplicated or lost when
+several players use the same storage. This works best with Chestworks installed on the
+server, since every player then has it too.
 
-A request that reaches a game which no longer controls the container is passed on to
-the one that does. One that comes back to the game that sent it is dropped, as that game
-has already applied it to its own copy.
-
-On a server without Chestworks, other players may not have it, so there is no one to
-ask. Your game takes control of the container instead and tells the previous owner at
-once, as the game's own "take all" does once it has been allowed. An open container is
-never taken over this way, even with MultiUserChest, as the player using it would be
-left looking at old contents.
+On a server without Chestworks, it still works: it handles each chest the same way
+the game's own "Take all" does. A chest someone has open is always skipped there,
+even with MultiUserChest.

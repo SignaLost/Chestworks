@@ -20,7 +20,7 @@ dotnet build -c Release
 The build finds Valheim in the usual Steam locations, BepInEx in the game folder or a
 Gale or r2modman `Default` profile, and Jotunn in that BepInEx's `plugins`. It prints
 what it found, publicizes the game assemblies, and installs the whole package into
-`BepInEx/plugins/NullSignal.Chestworks`, the way a mod manager would.
+`BepInEx/plugins/NullSignal-Chestworks`, the folder a mod manager uses.
 
 If any of those guesses is wrong, say so once in a `Directory.Build.props` beside the
 `.csproj` (it is in `.gitignore`):
@@ -55,8 +55,8 @@ characters at most), `ManifestWebsite` the repository URL, and the dependency li
 the `PackageFiles` target pin the BepInEx pack and Jotunn. `icon.png` must be exactly
 256x256.
 
-`PluginGuid` names the folder deployed into and the config file; the DLL stays
-`Chestworks.dll`. The build fails if `PluginGuid` or `Version` stops matching the
+`PluginGuid` names the config file and `PluginFolder` the folder deployed into; the DLL
+stays `Chestworks.dll`. The build fails if `PluginGuid` or `Version` stops matching the
 constants in `ChestworksPlugin.cs`.
 
 `Chestworks.xml` carries the API's documentation, so mods that reference the DLL see it
