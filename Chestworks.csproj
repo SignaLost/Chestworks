@@ -8,7 +8,7 @@
     <!-- The author prefix belongs on the plugin folder and the config file, not the DLL. -->
     <PluginGuid>NullSignal.Chestworks</PluginGuid>
     <PluginFolder>NullSignal-Chestworks</PluginFolder>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Description>A shared storage network for Valheim mods: which containers are in reach, safe taking and storing in multiplayer, and one API for counts.</Description>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>

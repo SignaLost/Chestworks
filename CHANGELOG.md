@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+- Fixed `IsUsable` saying yes to a locked chest. Mods that pick chests themselves now
+  skip locked ones too.
+- `Stock` can count the way `Take` takes, with the world level in mind.
+- The API version is now 2, so mods can tell the 1.1 additions are there.
+
 ## 1.1.0
 
 - A padlock button in the chest panel. Mods leave a locked chest alone, and everyone on

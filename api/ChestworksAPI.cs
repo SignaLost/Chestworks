@@ -11,7 +11,8 @@ namespace Chestworks;
 /// </summary>
 public static class ChestworksAPI
 {
-    public const int Version = 1;
+    /// <summary>Rises when members are added or change meaning: 1 for 1.0, 2 for 1.1, which added <see cref="IsLocked" />, <see cref="ReachRules.Filter" /> and the lock check in <see cref="IsUsable" />.</summary>
+    public const int Version = 2;
 
     public const string Guid = ChestworksPlugin.PluginGuid;
 
@@ -64,12 +65,12 @@ public static class ChestworksAPI
     public static int Revision => StorageNetwork.Revision;
 
     /// <summary>
-    ///     How much of an item, by shared name, the purpose's containers hold, without the inventory.
-    ///     Cached for the frame; 0 when the purpose is not active.
+    ///     How much of an item, by shared name, the purpose's containers hold, without the inventory, counted the way
+    ///     <see cref="Take" /> would take it. Cached for the frame; 0 when the purpose is not active.
     /// </summary>
-    public static int Stock(string purpose, string item, int quality = -1)
+    public static int Stock(string purpose, string item, int quality = -1, bool worldLevelBased = true)
     {
-        return string.IsNullOrEmpty(item) ? 0 : StorageNetwork.Count(purpose, item, quality);
+        return string.IsNullOrEmpty(item) ? 0 : StorageNetwork.Count(purpose, item, quality, worldLevelBased);
     }
 
     /// <summary>Whether a player has locked the container, so no purpose takes from it or stores in it.</summary>
@@ -143,11 +144,11 @@ public static class ChestworksAPI
 
     /// <summary>
     ///     Whether the local player may draw on the container: player-built, allowed by its privacy and wards, not
-    ///     open elsewhere, and not on a moving or pulled cart or ship. Reach is not considered.
+    ///     locked by a player, not open elsewhere, and not on a moving or pulled cart or ship. Reach is not considered.
     /// </summary>
     public static bool IsUsable(Container container)
     {
-        if (!container || !container.m_nview || !container.m_nview.IsValid() || !Game.instance)
+        if (!container || !container.m_nview || !container.m_nview.IsValid() || !Game.instance || ChestLock.IsLocked(container))
         {
             return false;
         }

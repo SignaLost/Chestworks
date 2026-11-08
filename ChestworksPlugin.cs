@@ -35,7 +35,7 @@ public sealed class ChestworksPlugin : BaseUnityPlugin
 {
     public const string PluginName = "Chestworks";
     public const string PluginGuid = "NullSignal.Chestworks";
-    public const string PluginVersion = "1.1.0";
+    public const string PluginVersion = "1.1.1";
 
     private const string SecGeneral = "1. General";
     private const string EnglishFile = "chestworks.json";

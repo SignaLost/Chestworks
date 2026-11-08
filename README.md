@@ -65,7 +65,7 @@ For an optional dependency, use `BepInDependency.DependencyFlags.SoftDependency`
 the GUID `"NullSignal.Chestworks"` and reach the API by reflection (below) only when
 that GUID is in `Chainloader.PluginInfos`.
 
-On Thunderstore, list `NullSignal-Chestworks-1.1.0` in your manifest's dependencies.
+On Thunderstore, list `NullSignal-Chestworks-1.1.1` in your manifest's dependencies.
 
 ### Owning a purpose
 
@@ -103,7 +103,10 @@ private void Awake()
 Station ranges are each station's current build range, so mods that change station
 ranges are respected. A second mod registering the same purpose is refused with a
 warning; `UnregisterReach` gives a purpose up. Chests players have locked are left out
-before `Filter` is asked, as are the items players keep in their chests.
+before `Filter` is asked, as are the items players keep in their chests. `Filter` is asked
+per chest, each time the containers are gathered: four times a second, or sooner when the
+character or the point moves. `Keep In Chests` is each player's own setting and holds back
+that many of an item across everything in reach, not per chest.
 
 ### Counting for an interface
 
@@ -181,14 +184,14 @@ Optional parameters are shown with their defaults.
 
 | Member | Gives |
 |---|---|
-| `Version`, `Guid` | The API version (`1`) and `"NullSignal.Chestworks"` |
+| `Version`, `Guid` | The API version (`2` since 1.1) and `"NullSignal.Chestworks"` |
 | `RegisterReach(purpose, ownerGuid, rules)` | Owns a purpose; `rules` is a `Func<Player, ReachRules>` |
 | `UnregisterReach(purpose, ownerGuid)` | Gives the purpose up |
 | `DefersTo(modGuid, purpose, active)` | Leaves the purpose (every purpose for null) to a mod while `active()` is true |
 | `ShowsStock(modGuid)` | Switches off the compatibility patch for an interface mod |
 | `IsActive(purpose)` | The purpose reaches containers right now and is not deferred |
 | `Revision` | Rises whenever stock may have changed |
-| `Stock(purpose, item, quality = -1)` | The containers' stock of an item, without the inventory |
+| `Stock(purpose, item, quality = -1, worldLevelBased = true)` | The containers' stock of an item, without the inventory, as `Take` would count it |
 | `GetContainers(purpose, into)` | Adds the purpose's containers, nearest first, to a `List<Container>` |
 | `HasCheated(purpose, resources, quality = -1, matchWorldLevel = true)` | Cheated items among those containers, as the game checks the inventory |
 | `Take(purpose, item, amount, quality = -1, worldLevelBased = true)` | Takes, nearest first; returns what was taken |
@@ -196,7 +199,7 @@ Optional parameters are shown with their defaults.
 | `AddItems(inventory, prefab, amount, cheated = false)` | Adds in proper stacks within free space; returns what was added |
 | `IsLocked(container)` | A player has locked the container, so no purpose uses it |
 | `IsOpenElsewhere(container)` | Another player's game has the container open |
-| `IsUsable(container)` | The container passes the rules for the local player, reach aside |
+| `IsUsable(container)` | The container passes the rules for the local player, locks included, reach aside |
 | `IsStorageInUse(piece)` | A container in the piece is open elsewhere, or its cart is pulled by someone else |
 
 ### Without a reference

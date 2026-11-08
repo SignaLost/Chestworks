@@ -78,6 +78,21 @@ is in the `Chestworks` namespace itself.
 | `Thunderstore/` | The package icon, copied into the output folder |
 | `faq/` | The mod page's FAQ entries, copied into the output folder |
 
+## Versioning
+
+- **0.0.1** fixes and small additions. Nothing in the API changes.
+- **0.1.0** the API gains members or something in it behaves differently. `ChestworksAPI.Version`
+  goes up by one, so a mod can tell by reflection what is there.
+- **1.0.0** something existing mods would break on.
+
+Saves and settings stay readable across all three. Every change is listed in the
+changelog under its version.
+
+Mods built against Chestworks declare the lowest version they were built with, and work with
+every later release of the same major version. Each 0.1.0 or 1.0.0 release of Chestworks
+therefore gets a matching release of each dependent, built against it, even when nothing
+in that mod had to change: that is what makes the pairing known to work.
+
 ## Building mods that use it
 
 Build Chestworks first. It deploys into the same profile, where mods that reference it,
