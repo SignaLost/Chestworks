@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Chestworks;
@@ -16,4 +17,7 @@ public sealed class ReachRules
 
     /// <summary>Where the work happens, or null for the character; containers nearest it are used first.</summary>
     public Vector3? Point;
+
+    /// <summary>Which of the containers in reach the purpose may use; null for all of them. Chests players have locked are never used.</summary>
+    public Func<Container, bool> Filter;
 }

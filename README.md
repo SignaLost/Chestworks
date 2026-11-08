@@ -20,6 +20,10 @@ are used first.
 count. It skips anything someone has open, a cart being pulled, a moving ship, someone
 else's private chest, and chests inside a ward you can't open.
 
+**Lets you keep chests to yourself.** Open a chest and click the padlock, and no mod will
+take from it or put anything in it. Everyone on the server sees the lock. You can also
+set a number of each item that always stays in your chests.
+
 **Stays safe in multiplayer.** Only one player's game changes a chest at a time, so
 nothing gets duplicated or lost when several players use the same storage. With
 MultiUserChest and Chestworks on the server, a chest someone else has open stays usable.
@@ -37,8 +41,7 @@ to install it.
 
 Everything goes through `ChestworksAPI`, a public static class in `Chestworks.dll`. It
 works for the local player, must be called from the main thread, and returns nothing (or
-does nothing) before a world loads. `ChestworksAPI.Version` rises when members are
-added; existing members keep their meaning.
+does nothing) before a world loads.
 
 ### Purposes
 
@@ -62,7 +65,7 @@ For an optional dependency, use `BepInDependency.DependencyFlags.SoftDependency`
 the GUID `"NullSignal.Chestworks"` and reach the API by reflection (below) only when
 that GUID is in `Chainloader.PluginInfos`.
 
-On Thunderstore, list `NullSignal-Chestworks-1.0.0` in your manifest's dependencies.
+On Thunderstore, list `NullSignal-Chestworks-1.1.0` in your manifest's dependencies.
 
 ### Owning a purpose
 
@@ -90,6 +93,7 @@ private void Awake()
         Rules.Stations = true;  // stations covering the character or the point
         Rules.Linked = false;   // plus stations linked to those by overlapping ranges
         Rules.Point = station ? station.transform.position : null;  // null: the character
+        Rules.Filter = null;    // or a Func<Container, bool> choosing among those in reach
         return Rules;
     });
 }
@@ -98,7 +102,8 @@ private void Awake()
 `ReachRules` can be reused as above; Chestworks reads it at once and does not keep it.
 Station ranges are each station's current build range, so mods that change station
 ranges are respected. A second mod registering the same purpose is refused with a
-warning; `UnregisterReach` gives a purpose up.
+warning; `UnregisterReach` gives a purpose up. Chests players have locked are left out
+before `Filter` is asked, as are the items players keep in their chests.
 
 ### Counting for an interface
 
@@ -189,6 +194,7 @@ Optional parameters are shown with their defaults.
 | `Take(purpose, item, amount, quality = -1, worldLevelBased = true)` | Takes, nearest first; returns what was taken |
 | `Store(purpose, point, prefab, amount, cheated = false, exclude = null)` | Stores where the item already is; returns what was stored |
 | `AddItems(inventory, prefab, amount, cheated = false)` | Adds in proper stacks within free space; returns what was added |
+| `IsLocked(container)` | A player has locked the container, so no purpose uses it |
 | `IsOpenElsewhere(container)` | Another player's game has the container open |
 | `IsUsable(container)` | The container passes the rules for the local player, reach aside |
 | `IsStorageInUse(piece)` | A container in the piece is open elsewhere, or its cart is pulled by someone else |

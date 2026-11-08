@@ -8,7 +8,7 @@
     <!-- The author prefix belongs on the plugin folder and the config file, not the DLL. -->
     <PluginGuid>NullSignal.Chestworks</PluginGuid>
     <PluginFolder>NullSignal-Chestworks</PluginFolder>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Description>A shared storage network for Valheim mods: which containers are in reach, safe taking and storing in multiplayer, and one API for counts.</Description>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
@@ -81,6 +81,8 @@
   <ItemGroup>
     <Reference Include="assembly_valheim" HintPath="$(ManagedPath)/assembly_valheim.dll" Publicize="true" Private="false" />
     <Reference Include="assembly_utils" HintPath="$(ManagedPath)/assembly_utils.dll" Publicize="true" Private="false" />
+    <!-- Localization lives here. -->
+    <Reference Include="assembly_guiutils" HintPath="$(ManagedPath)/assembly_guiutils.dll" Publicize="true" Private="false" />
 
     <Reference Include="BepInEx" HintPath="$(BepInExPath)/core/BepInEx.dll" Private="false" />
     <Reference Include="0Harmony" HintPath="$(BepInExPath)/core/0Harmony.dll" Private="false" />
@@ -89,6 +91,17 @@
     <Reference Include="UnityEngine" HintPath="$(ManagedPath)/UnityEngine.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(ManagedPath)/UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.PhysicsModule" HintPath="$(ManagedPath)/UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(ManagedPath)/UnityEngine.UI.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(ManagedPath)/UnityEngine.UIModule.dll" Private="false" />
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ManagedPath)/Unity.TextMeshPro.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- English, as the fallback when the Translations folder is not installed beside the DLL. -->
+    <EmbeddedResource Include="Translations/English/chestworks.json" LogicalName="Chestworks.Translations.English.json" />
+    <!-- The Lock button's icons, white so they take the button text's color. -->
+    <EmbeddedResource Include="Resources/locked.png" LogicalName="Chestworks.Icons.Locked.png" />
+    <EmbeddedResource Include="Resources/unlocked.png" LogicalName="Chestworks.Icons.Unlocked.png" />
   </ItemGroup>
 
   <!--
@@ -144,11 +157,14 @@
 
     <ItemGroup>
       <_FaqPage Include="faq/**/*.md" />
+      <_Translation Include="Translations/**/*.json" />
     </ItemGroup>
 
     <WriteLinesToFile File="$(OutputPath)manifest.json" Lines="@(_ManifestLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
     <Copy SourceFiles="README.md;CHANGELOG.md;LICENSE.md;Thunderstore/icon.png" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(_FaqPage)" DestinationFiles="@(_FaqPage->'$(OutputPath)faq/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <!-- Jotunn loads Translations/<Language>/*.json from anywhere under the plugins folder. -->
+    <Copy SourceFiles="@(_Translation)" DestinationFiles="@(_Translation->'$(OutputPath)Translations/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
 
   <!--
@@ -171,5 +187,8 @@
     <Message Condition="Exists('$(BepInExPath)/plugins')" Importance="high" Text="Deployed to $(_PluginDir)" />
     <Warning Condition="!Exists('$(BepInExPath)/plugins')" Text="Built but not deployed: no plugins folder under '$(BepInExPath)'. The package is in $(OutputPath)." />
   </Target>
+
+  <!-- Trims the XML docs to the API; see the file for how. -->
+  <Import Project="ApiDocs.targets" />
 
 </Project>

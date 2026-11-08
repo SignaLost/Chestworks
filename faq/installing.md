@@ -11,13 +11,19 @@ manager installs it for you. On its own, Chestworks changes nothing in the game.
 
 ## Settings
 
-The settings file is `BepInEx/config/NullSignal.Chestworks.cfg`. It has one setting:
+The settings file is `BepInEx/config/NullSignal.Chestworks.cfg`.
 
 | Setting | Default | What it does |
 |---|---|---|
 | `Verbosity` | `Low` | How much it writes to the log: `Low`, `Medium` or `High` |
+| `Keep In Chests` | `0` | How many of each item mods always leave in your chests |
+| `Lock Button Style` | `Button` | `Button`, a square copy of Take All, or `Tab`, like the chest's weight tab. With Auga, always one of its own buttons, reading Lock or Unlock |
+| `Button Anchor` | `TakeAll` | Button style: just past `TakeAll` or `PlaceStacks`, or inside the panel's `TopLeft`, `TopRight`, `BottomLeft` or `BottomRight` corner |
+| `Button Offset` | `0, 0` | Button style: moves it from its anchor, in pixels, right and up |
+| `Tab Anchor` | `RightTop` | Tab style: the panel edge it hangs from and where along it, such as `RightTop`, `LeftBottom` or `TopRight` |
+| `Tab Offset` | `0, 0` | Tab style: moves it from its anchor, in pixels, right and up |
 
-Each player sets this one for themselves. Everything else is up to the mods that use it.
+Each player sets these for themselves. Everything else is up to the mods that use it.
 
 ## Multiplayer
 

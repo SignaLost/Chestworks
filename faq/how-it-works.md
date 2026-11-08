@@ -13,6 +13,20 @@ A container is skipped while:
 - it's a cart being pulled or moving, or a ship that's sailing or has someone at the helm;
 - it's someone else's private chest, or inside a ward you can't open.
 
+## Keeping a chest to yourself
+
+Open a chest and click the padlock beside the game's own buttons. Mods then leave that
+chest alone: nothing is taken from it and nothing is put in it. The padlock shows closed,
+the chest's name reads "( Locked )" when you look at it, and everyone on the server sees the
+same lock.
+Click the padlock again to free it. The `Lock Button` settings move it if it's in your way.
+
+With SeneaL UI, use the exclusion button in its chest header instead; Chestworks treats
+it as the same lock. With Auga, the button is one of its own, reading Lock or Unlock.
+
+To keep some of everything, set `Keep In Chests`. With it at 5, mods never count or take
+the last 5 of any item in your chests.
+
 ## How far it reaches
 
 Each mod decides how far its feature reaches, such as building or crafting. The reach can
@@ -42,3 +56,7 @@ server, since every player then has it too.
 On a server without Chestworks, it still works: it handles each chest the same way
 the game's own "Take all" does. A chest someone has open is always skipped there,
 even with MultiUserChest.
+
+If two players take the same items from one chest at the same moment, the one a moment
+behind pays for them from their own inventory or another chest in reach instead, so
+nothing is made from thin air.

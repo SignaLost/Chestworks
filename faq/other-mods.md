@@ -26,6 +26,11 @@ to their counts and to their "from chests" marker.
 If you turn on SeneaL UI's own build-from-chests or craft-from-chests setting, SeneaL UI
 takes from chests itself, and Chestworks leaves that part to it.
 
+## Auga
+
+Auga replaces the chest panel. The lock is one of Auga's own buttons there, reading Lock
+or Unlock, beside Take All or wherever the `Button Anchor` setting puts it.
+
 ## Backpack mods
 
 Backpacks and other containers you carry are part of your inventory, so Chestworks

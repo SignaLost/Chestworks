@@ -28,7 +28,7 @@ internal static class StorageNetwork
         internal string Owner;
         internal Func<Player, ReachRules> Rules;
         internal readonly List<Container> Available = new();
-        internal readonly Dictionary<(string Name, int Quality, bool WorldLevel), int> Counts = new();
+        internal readonly Dictionary<(string Name, int Quality), Stock> Counts = new();
         internal float NextScan = -1f;
         internal Vector3 ScanCharacter;
         internal Vector3 ScanPoint;
@@ -37,6 +37,13 @@ internal static class StorageNetwork
         internal int Signature;
         internal int RulesFrame = -1;
         internal ReachRules LastRules;
+    }
+
+    /// <summary>An item's stock, all of it and the part at or above the world level.</summary>
+    private struct Stock
+    {
+        internal int All;
+        internal int Leveled;
     }
 
     private sealed class Deferral
@@ -215,43 +222,65 @@ internal static class StorageNetwork
         return state.Available;
     }
 
-    /// <summary>Stock of an item across the purpose's containers, cached for the frame.</summary>
+    /// <summary>Stock of an item across the purpose's containers, from one tally of every container, made once a frame.</summary>
     internal static int Count(string purpose, string name, int quality = -1, bool matchWorldLevel = true)
     {
         List<Container> containers = Available(purpose);
 
-        if (containers.Count == 0 || !_purposes.TryGetValue(purpose, out Purpose state))
+        if (name == null || containers.Count == 0 || !_purposes.TryGetValue(purpose, out Purpose state))
         {
             return 0;
         }
 
-        (string, int, bool) key = (name, quality, matchWorldLevel);
-
         if (state.CountFrame != Time.frameCount)
         {
             state.CountFrame = Time.frameCount;
-            state.Counts.Clear();
+            Tally(containers, state.Counts);
         }
 
-        if (state.Counts.TryGetValue(key, out int cached))
+        if (!state.Counts.TryGetValue((name, quality < 0 ? -1 : quality), out Stock stock))
         {
-            return cached;
+            return 0;
         }
 
-        int total = 0;
+        return Mathf.Max(0, (matchWorldLevel ? stock.Leveled : stock.All) - ChestworksPlugin.Keep.Value);
+    }
+
+    /// <summary>Counts every stack in the containers, by name and quality and by name alone, the way <c>Inventory.CountItems</c> would.</summary>
+    private static void Tally(List<Container> containers, Dictionary<(string Name, int Quality), Stock> into)
+    {
+        into.Clear();
 
         foreach (Container container in containers)
         {
-            if (container)
+            if (!container)
             {
-                // Load picks up changes by other players ahead of the game's once-a-second check.
-                container.Load();
-                total += container.GetInventory().CountItems(name, quality, matchWorldLevel);
+                continue;
+            }
+
+            // Load picks up changes by other players ahead of the game's once-a-second check.
+            container.Load();
+
+            foreach (ItemDrop.ItemData item in container.GetInventory().GetAllItems())
+            {
+                if (item?.m_shared == null)
+                {
+                    continue;
+                }
+
+                int leveled = item.m_worldLevel >= Game.m_worldLevel ? item.m_stack : 0;
+                Add(into, (item.m_shared.m_name, -1), item.m_stack, leveled);
+                Add(into, (item.m_shared.m_name, item.m_quality), item.m_stack, leveled);
             }
         }
+    }
 
-        state.Counts[key] = total;
-        return total;
+    private static void Add(Dictionary<(string Name, int Quality), Stock> into, (string, int) key, int all, int leveled)
+    {
+        into.TryGetValue(key, out Stock stock);
+        stock.All += all;
+        stock.Leveled += leveled;
+        into[key] = stock;
     }
 
     internal static bool Cheated(string purpose, Piece.Requirement[] resources, int quality, bool matchWorldLevel)
@@ -274,6 +303,9 @@ internal static class StorageNetwork
     internal static int Take(string purpose, string name, int amount, int quality, bool worldLevelBased)
     {
         int taken = 0;
+
+        // Never below what the player keeps in the chests.
+        amount = Mathf.Min(amount, Count(purpose, name, quality, worldLevelBased));
 
         foreach (Container container in Available(purpose))
         {
@@ -302,7 +334,7 @@ internal static class StorageNetwork
 
             if (ask)
             {
-                ContainerRequests.Take(container.m_nview, name, part, quality, worldLevelBased);
+                ContainerRequests.Take(purpose, container.m_nview, name, part, quality, worldLevelBased);
             }
         }
 
@@ -413,7 +445,8 @@ internal static class StorageNetwork
             Vector3 position = entry.Container.transform.position;
             bool inRadius = (eye - position).sqrMagnitude < radiusSqr;
 
-            if ((inRadius || InStationRange(position)) && Usability.Usable(entry, playerId))
+            if ((inRadius || InStationRange(position)) && Usability.Usable(entry, playerId) && !ChestLock.IsLocked(entry.Container)
+                && Passes(rules, entry.Container))
             {
                 into.Add(entry.Container);
             }
@@ -423,6 +456,25 @@ internal static class StorageNetwork
         _stations.Clear();
         _linked.Clear();
         SortByDistance(into, point);
+    }
+
+    /// <summary>The rules' own filter, if any; one that throws is logged and lets the container through.</summary>
+    private static bool Passes(ReachRules rules, Container container)
+    {
+        if (rules.Filter == null)
+        {
+            return true;
+        }
+
+        try
+        {
+            return rules.Filter(container);
+        }
+        catch (Exception e)
+        {
+            Log.LogError($"A reach filter failed: {e.Message}");
+            return true;
+        }
     }
 
     private static void SortByDistance(List<Container> containers, Vector3 point)

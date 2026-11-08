@@ -72,6 +72,12 @@ public static class ChestworksAPI
         return string.IsNullOrEmpty(item) ? 0 : StorageNetwork.Count(purpose, item, quality);
     }
 
+    /// <summary>Whether a player has locked the container, so no purpose takes from it or stores in it.</summary>
+    public static bool IsLocked(Container container)
+    {
+        return ChestLock.IsLocked(container);
+    }
+
     /// <summary>The purpose's containers, nearest its point first, added to the list.</summary>
     public static void GetContainers(string purpose, List<Container> into)
     {

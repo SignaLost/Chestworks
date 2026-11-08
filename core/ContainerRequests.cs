@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Chestworks.Common;
 
@@ -7,29 +8,55 @@ namespace Chestworks.Core;
 ///     servers that run Chestworks. The sender has already applied the change to its local copy; the owner applies
 ///     it to the authoritative inventory. A request that reaches a game which no longer owns the container is
 ///     passed on to the new owner, up to <see cref="MaxHops" /> times, and dropped if it returns to its origin.
+///     When the owner holds fewer items than a take asked for, because someone else took them in the same moment,
+///     it says so, and the taker pays the difference from their own inventory or another container in reach.
 /// </summary>
 internal static class ContainerRequests
 {
     private const string TakeRpc = "Chestworks_ContainerTake";
     private const string StoreRpc = "Chestworks_ContainerStore";
+    private const string ShortRpc = "Chestworks_ContainerTakeShort";
 
     /// <summary>How many times a request may be passed on.</summary>
     private const int MaxHops = 2;
+
+    /// <summary>Takes waiting for the owner's answer, by request number; forgotten after a while.</summary>
+    private sealed class Pending
+    {
+        internal string Purpose;
+        internal string Name;
+        internal int Quality;
+        internal bool WorldLevelBased;
+        internal float Until;
+    }
+
+    private const float PendingSeconds = 30f;
+    private static readonly Dictionary<int, Pending> _pending = new();
+    private static int _nextRequest;
 
     internal static void Register()
     {
         ZRoutedRpc.instance.Register<ZDOID, ZPackage>(TakeRpc, OnTake);
         ZRoutedRpc.instance.Register<ZDOID, ZPackage>(StoreRpc, OnStore);
+        ZRoutedRpc.instance.Register<int, int>(ShortRpc, OnShort);
+        _pending.Clear();
     }
 
     /// <summary>Asks the container's owner to remove items this game already removed from its local copy.</summary>
-    internal static void Take(ZNetView view, string name, int amount, int quality, bool worldLevelBased)
+    internal static void Take(string purpose, ZNetView view, string name, int amount, int quality, bool worldLevelBased)
     {
+        Forget();
+        int request = ++_nextRequest;
+        _pending[request] = new Pending { Purpose = purpose, Name = name, Quality = quality, WorldLevelBased = worldLevelBased, Until = Time.time + PendingSeconds };
+
         ZPackage package = new();
         package.Write(name);
         package.Write(amount);
         package.Write(quality);
         package.Write(worldLevelBased);
+
+        // After the fields a 1.0.0 owner reads, which ignores the rest and never answers.
+        package.Write(request);
         Send(TakeRpc, view.GetZDO(), package, ZDOMan.GetSessionID(), 0);
     }
 
@@ -68,13 +95,82 @@ internal static class ContainerRequests
         int quality = body.ReadInt();
         bool worldLevelBased = body.ReadBool();
 
+        int request = body.GetPos() < body.Size() ? body.ReadInt() : 0;
+
         Inventory inventory = container.GetInventory();
         int held = inventory.CountItems(name, quality, worldLevelBased);
         inventory.RemoveItem(name, amount, quality, worldLevelBased);
 
         if (held < amount)
         {
-            Log.LogWarning($"{container.name} held {held} of the {amount} {name} asked for.");
+            Log.LogInfo($"{container.name} held {held} of the {amount} {name} asked for.");
+
+            if (request != 0)
+            {
+                ZRoutedRpc.instance.InvokeRoutedRPC(origin, ShortRpc, request, amount - held);
+            }
+        }
+    }
+
+    /// <summary>The owner's answer that a take came up short; the difference is paid for here.</summary>
+    private static void OnShort(long sender, int request, int missing)
+    {
+        if (!_pending.TryGetValue(request, out Pending take))
+        {
+            return;
+        }
+
+        _pending.Remove(request);
+        Player player = Player.m_localPlayer;
+
+        if (!player || missing <= 0)
+        {
+            return;
+        }
+
+        Inventory own = player.GetInventory();
+        int fromOwn = Mathf.Min(missing, own.CountItems(take.Name, take.Quality, take.WorldLevelBased));
+
+        if (fromOwn > 0)
+        {
+            own.RemoveItem(take.Name, fromOwn, take.Quality, take.WorldLevelBased);
+            missing -= fromOwn;
+        }
+
+        if (missing > 0)
+        {
+            missing -= StorageNetwork.Take(take.Purpose, take.Name, missing, take.Quality, take.WorldLevelBased);
+        }
+
+        if (missing > 0)
+        {
+            Log.LogInfo($"{missing} {take.Name} taken from a container were already gone, and nothing was left to pay them with.");
+        }
+    }
+
+    private static void Forget()
+    {
+        if (_pending.Count == 0)
+        {
+            return;
+        }
+
+        List<int> stale = null;
+
+        foreach (KeyValuePair<int, Pending> entry in _pending)
+        {
+            if (Time.time > entry.Value.Until)
+            {
+                (stale ??= new List<int>()).Add(entry.Key);
+            }
+        }
+
+        if (stale != null)
+        {
+            foreach (int request in stale)
+            {
+                _pending.Remove(request);
+            }
         }
     }
 
